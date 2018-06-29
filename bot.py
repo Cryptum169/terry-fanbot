@@ -35,10 +35,6 @@ class TerryBot(commands.AutoShardedBot):
             print(bot.user.id)
             print('------')
 
-        @bot.command(name='Hi')
-        async def greet(ctx):
-            await ctx.send(":smiley: :wave: Hello, there!")
-
         bot.remove_command('help')
 
         @bot.command()
@@ -65,8 +61,8 @@ class TerryBot(commands.AutoShardedBot):
                 try:
                     self.bot.load_extension(f"modules.{name}")
                     print('Sucessfully Loaded {}'.format(name))
-                except:
+                except Exception as e:
                     exc = '{}: {}'.format(type(e).__name__, e)
-                    print('Failed to load extension {}\n{}'.format(extension, exc))
+                    print('Failed to load extension {}\n{}'.format(name, exc))
 
         bot.run(self.botToken)

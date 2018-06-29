@@ -6,11 +6,15 @@ class ChatBot():
         self.bot = bot
 
     @commands.command(name='Hi')
-    async def greet(ctx):
+    async def greet(self, ctx):
         await ctx.send(":smiley: :wave: Hello, there!")
 
     @commands.command()
-    async def info(ctx):
+    async def talk(self, ctx, sentence:str):
+        await ctx.send("你刚说了 {}".format(sentence))
+
+    @commands.command()
+    async def info(self, ctx):
         embed = discord.Embed(
             title=self.name, description="Nicest bot there is ever.", color=0xeee657)
         # give info about you here
