@@ -1,4 +1,4 @@
-import module.bot as bot
+import bot
 import data.botSecret as bS
 
 if __name__ == '__main__':
