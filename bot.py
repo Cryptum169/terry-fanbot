@@ -1,20 +1,33 @@
 import discord
 from discord.ext import commands
+import os
 
-class TerryBot():
+class TerryBot(commands.AutoShardedBot):
 
-    def __init__(self, cmd_prefix='$',botToken = None):
+    def __init__(self, cmd_prefix='$', botToken=None):
+        super().__init__(command_prefix=cmd_prefix,  # commands.when_mentioned_or('n!')
+                         description="Terry-Fanbot",
+                         pm_help=None,
+                         shard_id=0,
+                         status=discord.Status.dnd,
+                         activity=discord.Game(name="Restarting..."),
+                         fetch_offline_members=False,
+                         max_messages=2500,
+                         help_attrs={'hidden': True})
+
         if botToken == None:
             print('Did not pass in bot Token')
             exit()
         else:
             self.botToken = botToken
+
         self.name = 'Terry\'s Fan bot'
         self.cmd_prefix = cmd_prefix
         self.bot = commands.Bot(command_prefix=cmd_prefix)
 
     def load_bot(self):
         bot = self.bot
+
         @bot.event
         async def on_ready():
             print('Logged in as')
@@ -22,38 +35,9 @@ class TerryBot():
             print(bot.user.id)
             print('------')
 
-        @bot.command()
-        async def adddd(ctx, a: int, b: int):
-            await ctx.send(a+b)
-
-        @bot.command()
-        async def multiply(ctx, a: int, b: int):
-            await ctx.send(a*b)
-
-        @bot.command()
+        @bot.command(name='Hi')
         async def greet(ctx):
             await ctx.send(":smiley: :wave: Hello, there!")
-
-        @bot.command()
-        async def cat(ctx):
-            await ctx.send("https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif")
-
-        @bot.command()
-        async def info(ctx):
-            embed = discord.Embed(
-                title="nice bot", description="Nicest bot there is ever.", color=0xeee657)
-
-            # give info about you here
-            embed.add_field(name="Author", value="<YOUR-USERNAME>")
-
-            # Shows the number of servers the bot is member of.
-            embed.add_field(name="Server count", value=f"{len(bot.guilds)}")
-
-            # give users a link to invite thsi bot to their server
-            embed.add_field(
-                name="Invite", value="[Invite link](<insert your OAuth invitation link here>)")
-
-            await ctx.send(embed=embed)
 
         bot.remove_command('help')
 
@@ -61,20 +45,28 @@ class TerryBot():
         async def help(ctx):
             embed = discord.Embed(
                 title=self.name, description="A Very Nice bot. List of commands are:", color=0xeee657)
-
-            embed.add_field(name=(cmd_prefix + "add X Y"),
+            embed.add_field(name=(self.cmd_prefix + "add X Y"),
                             value="Gives the addition of **X** and **Y**", inline=False)
-            embed.add_field(name=(cmd_prefix + "multiply X Y"),
+            embed.add_field(name=(self.cmd_prefix + "multiply X Y"),
                             value="Gives the multiplication of **X** and **Y**", inline=False)
-            embed.add_field(name=(cmd_prefix + "greet"),
+            embed.add_field(name=(self.cmd_prefix + "greet"),
                             value="Gives a nice greet message", inline=False)
-            embed.add_field(name=(cmd_prefix + "cat"),
+            embed.add_field(name=(self.cmd_prefix + "cat"),
                             value="Gives a cute cat gif to lighten up the mood.", inline=False)
-            embed.add_field(name=(cmd_prefix + "info"),
+            embed.add_field(name=(self.cmd_prefix + "info"),
                             value="Gives a little info about the bot", inline=False)
-            embed.add_field(name=(cmd_prefix + "help"),
+            embed.add_field(name=(self.cmd_prefix + "help"),
                             value="Gives this message", inline=False)
-
             await ctx.send(embed=embed)
+
+        for file in os.listdir("modules"):
+            if file.endswith(".py"):
+                name = file[:-3]
+                try:
+                    self.bot.load_extension(f"modules.{name}")
+                    print('Sucessfully Loaded {}'.format(name))
+                except:
+                    exc = '{}: {}'.format(type(e).__name__, e)
+                    print('Failed to load extension {}\n{}'.format(extension, exc))
 
         bot.run(self.botToken)
